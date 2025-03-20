@@ -43,6 +43,7 @@ import MDTypography from "components/MDTypography";
 
 // ReportsLineChart configurations
 import configs from "examples/Charts/LineCharts/ReportsLineChart/configs";
+import { height } from "@mui/system";
 
 ChartJS.register(
   CategoryScale,
@@ -55,7 +56,7 @@ ChartJS.register(
   Filler,
 );
 
-function ReportsLineChart({ color, title, description, date, chart }) {
+function ReportsLineChart({ color, title, description, date, chart,height }) {
   const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   return (
@@ -71,7 +72,7 @@ function ReportsLineChart({ color, title, description, date, chart }) {
               py={2}
               pr={0.5}
               mt={-5}
-              height="12.5rem"
+              height={height}
             >
               <Line data={data} options={options} redraw />
             </MDBox>
@@ -133,6 +134,7 @@ ReportsLineChart.propTypes = {
   chart: PropTypes.objectOf(
     PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   ).isRequired,
+  height:PropTypes.string.isRequired,
 };
 
 export default ReportsLineChart;

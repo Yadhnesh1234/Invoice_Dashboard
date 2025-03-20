@@ -33,15 +33,6 @@ import Footer from "layouts/authentication/components/Footer";
 function CoverLayout({ coverHeight, image, children }) {
   return (
     <PageLayout>
-      <DefaultNavbar
-        action={{
-          type: "external",
-          route: "https://creative-tim.com/product/material-dashboard-react",
-          label: "free download",
-        }}
-        transparent
-        light
-      />
       <MDBox
         width="calc(100% - 2rem)"
         minHeight={coverHeight}
@@ -49,7 +40,7 @@ function CoverLayout({ coverHeight, image, children }) {
         mx={2}
         my={2}
         pt={6}
-        pb={28}
+        pb={10}
         sx={{
           backgroundImage: ({
             functions: { linearGradient, rgba },
@@ -71,13 +62,13 @@ function CoverLayout({ coverHeight, image, children }) {
         width="calc(100% - 2rem)"
         mx="auto"
       >
-        <Grid container spacing={1} justifyContent="center">
-          <Grid item xs={11} sm={9} md={5} lg={4} xl={3}>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} md={8} lg={6}>
             {children}
           </Grid>
         </Grid>
       </MDBox>
-      <Footer />
+      {/* <Footer /> */}
     </PageLayout>
   );
 }
