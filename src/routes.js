@@ -56,7 +56,7 @@ const routes = [
     name: "Upload Invoice",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
+    route: "/invoice/verify",
     component: <SignIn />,
   },
   {
@@ -64,7 +64,7 @@ const routes = [
     name: "Verify Invoice",
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
+    route: "/invoice/sign-up",
     component: <SignUp />,
   },
 ];

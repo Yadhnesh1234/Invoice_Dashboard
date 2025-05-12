@@ -13,7 +13,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import { useEffect, useState } from "react";
-//http://127.0.0.1:8000/api/get-recommendation/
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
   const [salesData, setSalesData] = useState(null);
@@ -25,6 +24,26 @@ function Dashboard() {
   const [product, setProduct] = useState("")
   const [quantityData, setQuantityData] = useState(null);
   const [openQuantity, setOpenQuantity] = useState(false);
+  const [todaysStats, setTodaysStats] = useState({ invoices: 0, totalQuantity: 0, revenue: 0 });
+  
+   const fetchTodaysStats = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://127.0.0.1:8000/api/todays-stats/");
+      const data = await response.json();
+      
+      setTodaysStats({
+        invoices: data.total_invoices || 0,
+        totalQuantity: data.total_quantity || 0,
+        revenue: data.total_revenue || 0,
+      });
+      console.log("Response : ",data)
+    } catch (error) {
+      console.error("Error fetching today's stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -34,6 +53,7 @@ function Dashboard() {
         stock = 0
       else
         stock = product.split(" ")[0]
+        console.log(stock)
       const response = await fetch("http://127.0.0.1:8000/api/get-forecast-product/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,12 +100,13 @@ function Dashboard() {
       if (data && data.forecast) {
         const data_labels = data.forecast.map((item) => item.date);
         const predictions = data.forecast.map((item) =>
-          item.quantity != null ? parseInt(item.quantity) : 0
+          item.quantity != null ? parseInt(item.quantity) :parseInt(item.model1)
         );
         setQuantityData({
           labels: data_labels,
           datasets: { label: "Quantity Forecast", data: predictions },
         });
+        
       }
     } catch (error) {
       console.error("Error fetching quantity data:", error);
@@ -98,9 +119,12 @@ function Dashboard() {
     fetchData();
     fetchQuantityData();
   }, []);
+  useEffect(() => {
+    fetchTodaysStats();
+  }, []);
 
   useEffect(() => {
-  }, [salesData, productList,quantityData])
+  }, [salesData, productList,quantityData,todaysStats])
 
   const getSuggetionList = async () => {
     try {
@@ -166,24 +190,19 @@ function Dashboard() {
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={8} lg={4}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard color="dark" icon="weekend" title="Bookings" count={281} percentage={{ color: "success", amount: "+55%", label: "than last week" }} />
+              <ComplexStatisticsCard color="dark" icon="weekend" title="Quantity" count={todaysStats.invoices} percentage={{ color: "success", amount: "", label: "" }} />
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={8} lg={4}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard icon="leaderboard" title="Today's Users" count="2,300" percentage={{ color: "success", amount: "+3%", label: "than last month" }} />
+              <ComplexStatisticsCard icon="leaderboard" title="Today's Users" count={todaysStats.totalQuantity} percentage={{ color: "success", amount: "", label: "" }} />
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={8} lg={4}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard color="success" icon="store" title="Revenue" count="34k" percentage={{ color: "success", amount: "+1%", label: "than yesterday" }} />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard color="primary" icon="person_add" title="Followers" count="+91" percentage={{ color: "success", amount: "", label: "Just updated" }} />
+              <ComplexStatisticsCard color="success" icon="store" title="Revenue" count={todaysStats.revenue} percentage={{ color: "success", amount: "", label: "" }} />
             </MDBox>
           </Grid>
         </Grid>
@@ -207,7 +226,6 @@ function Dashboard() {
                   color="success"
                   title="Sales Forecast"
                   description={<>Get Daily, Weekly, Monthly Sale Forecast</>}
-                  date="updated 4 min ago"
                   chart={salesData}
                   height={"12.5rem"}
                 /> : <></>)}
@@ -322,7 +340,6 @@ function Dashboard() {
                       color="success"
                       title="Sales Forecast - Zoomed In"
                       description={<>Expanded View of Sales Forecast</>}
-                      date="updated 4 min ago"
                       chart={salesData}
                       height="25.5rem"
                     />
@@ -344,7 +361,6 @@ function Dashboard() {
                     color="dark"
                     title="Quantity Forecast"
                     description="Get Daily, Weekly, Monthly Quantity Forecast"
-                    date="just updated"
                     chart={quantityData}
                     height={"12.5rem"}
                   />
@@ -454,7 +470,6 @@ function Dashboard() {
                       color="dark"
                       title="Quantity Forecast - Zoomed In"
                       description={<>Expanded View of Quantity Forecast</>}
-                      date="just updated"
                       chart={quantityData}
                       height="25.5rem"
                     />
@@ -469,13 +484,13 @@ function Dashboard() {
         </MDBox>
 
         <MDBox>
-          <Grid container spacing={3}>
+         <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
               <Projects />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+           { /* <Grid item xs={12} md={6} lg={4}>
               <OrdersOverview />
-            </Grid>
+            </Grid>*/}
           </Grid>
         </MDBox>
       </MDBox>
